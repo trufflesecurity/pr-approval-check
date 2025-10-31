@@ -17,6 +17,19 @@ inputs:
   github_token:
     description: "Token with permission to read PRs and write commit statuses"
     required: true
+  owner:
+    description: "Owner of the repository being evaluated"
+    required: false
+    default: "trufflesecurity"
+  repo:
+    description: "Github respository for which to check approvers"
+    required: true
+  head:
+    description: "Head sha of the pull request"
+    required: true
+  number:
+    description: "Pull request number"
+    required: true
 
 runs:
   using: "composite"
@@ -24,19 +37,23 @@ runs:
     - name: Check for Product Engineering approval
       uses: actions/github-script@v7
       env:
+        OWNER: ${{ inputs.owner }}
         ORG: ${{ inputs.org }}
         APPROVER_TEAM: ${{ inputs.approver_team }}
+        REPO: ${{ inputs.repo }}
+        HEAD: ${{ inputs.head }}
+        NUMBER: ${{ inputs.number }}
       with:
         github-token: ${{ inputs.github_token }}
         script: |
-          const { ORG: org, APPROVER_TEAM: team } = process.env
-          const prettyTeamName = `@${org}/${team}`
+          const { REPO, OWNER, ORG, APPROVER_TEAM, HEAD, NUMBER } = process.env
+          const prettyTeamName = `@${ORG}/${TEAM}`
 
           async function status(state, msg) {
             await github.rest.repos.createCommitStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              sha: context.payload.pull_request.head.sha,
+              owner: OWNER,
+              repo: REPO,
+              sha: HEAD,
               state,
               context: 'pr-approval-check',
               description: msg,
@@ -73,9 +90,9 @@ runs:
             const iter = github.paginate.iterator(
               github.rest.pulls.listReviews,
               {
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: context.payload.pull_request.number,
+                owner: OWNER,
+                repo: REPO,
+                pull_number: NUMBER,
               }
             );
 
@@ -100,8 +117,8 @@ runs:
           for (const [login, review] of reviews) {
             try {
               const membership = await github.rest.teams.getMembershipForUserInOrg({
-                org,
-                team_slug: team,
+                org: ORG,
+                team_slug: APPROVER_TEAM,
                 username: login,
               });
 
