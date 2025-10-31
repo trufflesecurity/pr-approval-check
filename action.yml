@@ -39,14 +39,14 @@ runs:
       env:
         OWNER: ${{ inputs.owner }}
         ORG: ${{ inputs.org }}
-        APPROVER_TEAM: ${{ inputs.approver_team }}
+        TEAM: ${{ inputs.approver_team }}
         REPO: ${{ inputs.repo }}
         HEAD: ${{ inputs.head }}
         NUMBER: ${{ inputs.number }}
       with:
         github-token: ${{ inputs.github_token }}
         script: |
-          const { REPO, OWNER, ORG, APPROVER_TEAM, HEAD, NUMBER } = process.env
+          const { REPO, OWNER, ORG, TEAM, HEAD, NUMBER } = process.env
           const prettyTeamName = `@${ORG}/${TEAM}`
 
           async function status(state, msg) {
@@ -118,7 +118,7 @@ runs:
             try {
               const membership = await github.rest.teams.getMembershipForUserInOrg({
                 org: ORG,
-                team_slug: APPROVER_TEAM,
+                team_slug: TEAM,
                 username: login,
               });
 
