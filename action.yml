@@ -49,6 +49,13 @@ runs:
           const { REPO, OWNER, ORG, TEAM, HEAD, NUMBER } = process.env
           const prettyTeamName = `@${ORG}/${TEAM}`
 
+          console.log("REPO", REPO)
+          console.log("OWNER",OWNER)
+          console.log("ORG",ORG)
+          console.log("TEAM",TEAM)
+          console.log("HEAD",HEAD)
+          console.log("NUMBER",NUMBER)
+
           async function status(state, msg) {
             await github.rest.repos.createCommitStatus({
               owner: OWNER,
