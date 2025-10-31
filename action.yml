@@ -49,6 +49,8 @@ runs:
           const { REPO, OWNER, ORG, TEAM, HEAD, NUMBER } = process.env
           const prettyTeamName = `@${ORG}/${TEAM}`
 
+          console.log(github.event)
+
           console.log("REPO", REPO)
           console.log("OWNER",OWNER)
           console.log("ORG",ORG)
